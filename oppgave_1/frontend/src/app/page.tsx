@@ -1,12 +1,12 @@
 import React from "react";
-import Layout from "../layout/Layout";
+import All from "../pages/All";
 
 export default function Home() {
   return (
     <main className="h-full">
-      <Layout>
+      <All>
         <h2> Denne siden er tom </h2>
-      </Layout>
+      </All>
     </main>
   );
 }
