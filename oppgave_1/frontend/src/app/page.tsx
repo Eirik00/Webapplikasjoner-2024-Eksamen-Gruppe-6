@@ -1,3 +1,4 @@
+import React from "react";
 import All from "@/pages/All";
 
 export default function Home() {
@@ -7,4 +8,3 @@ export default function Home() {
     </main>
   );
 }
-import React from "react";
