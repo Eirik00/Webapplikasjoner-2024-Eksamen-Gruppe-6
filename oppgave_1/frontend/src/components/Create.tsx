@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { courseCreateSteps, categories } from "@/data/data";
 import useCourse from "@/hooks/useCourse";
 import { Lesson } from "@/types/types";

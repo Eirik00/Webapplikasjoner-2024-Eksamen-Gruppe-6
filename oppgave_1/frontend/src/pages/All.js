@@ -10,7 +10,7 @@ export default function All({ children }) {
           </h1>
           <ul className="flex gap-8" data-testid="nav">
             <li className="text-base font-semibold" data-testid="nav_courses">
-              <a href="kurs">Kurs</a>
+              <a href="/kurs">Kurs</a>
             </li>
             <li className="text-base font-semibold" data-testid="nav_new">
               <a href="/ny">Nytt kurs</a>
