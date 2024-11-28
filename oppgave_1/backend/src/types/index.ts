@@ -15,20 +15,26 @@ const initDb = () => {
   db.exec(`
     CREATE TABLE IF NOT EXISTS kurs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      category TEXT
+      title VARCHAR(256) NOT NULL,
+      slug VARCHAR(256) NOT NULL,
+      description VARCHAR(256) NOT NULL,
+      category VARCHAR(256)
     );
 
     CREATE TABLE IF NOT EXISTS leksjoner (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       kurs_id INTEGER NOT NULL,
-      title TEXT NOT NULL
+      title VARCHAR(256) NOT NULL,
+      slug VARCHAR(256) NOT NULL,
+      description VARCHAR(256) NOT NULL,
+      text JSON
     );
 
     CREATE TABLE IF NOT EXISTS kommentarer (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       leksjon_id INTEGER,
-      content TEXT
+      created_by VARCHAR(256),
+      comment VARCHAR(256)
     );
   `);
   } catch (error) {
