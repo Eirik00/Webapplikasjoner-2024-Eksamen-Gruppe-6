@@ -40,6 +40,7 @@ test.describe("Oppgave 1 Create", () => {
     test("Should have no success", async () => {});
     test("Should have test-id lessons", async () => {});
     test("Should have test-id form_lesson_add", async () => {});
+    test("Should have test-id form_lesson_add", async () => {});
   });
   test.describe("When added new lesson", () => {
     test("Should have disabled submit btn", async () => {});
@@ -51,6 +52,7 @@ test.describe("Oppgave 1 Create", () => {
     test("Should have test-id form_lesson_title", async () => {});
     test("Should have test-id form_lesson_slug", async () => {});
     test("Should have test-id form_lesson_preAmble", async () => {});
+    test("Should have test-id form_lesson_add_text", async () => {});
     test("Should have one lesson", async () => {});
   });
   test.describe("When creating multiple lessons", () => {
