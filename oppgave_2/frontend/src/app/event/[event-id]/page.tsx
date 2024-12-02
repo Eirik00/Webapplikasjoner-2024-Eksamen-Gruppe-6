@@ -14,7 +14,10 @@ const events: Record<string, Events> = {
     type: 'Konsert',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dui eros, bidendum vel bidendum ut, pretium in ipsum. quisque in phareta odio. nulla id venetatis libero. quisque in phareta odio. nulla id venetatis libero.',
     location: 'Halden',
-    ticket:{ price: 50, type: 'General Admission', availableSeats: 1000 },
+    tickets: [
+      { price: 50, type: 'General Admission', availableSeats: 1000 },
+      { price: 100, type: 'VIP', availableSeats: 200 }
+    ]
   },
 };
 
@@ -35,7 +38,7 @@ export default function EventPage({ params }: { params: { "event-id": string } }
         <p>Lokasjon: {event.location}</p>
         <div>
           <h3>Billetter:</h3>
-          {event.tickets.map((ticket, index) => (
+          {event.tickets?.map((ticket, index) => (
             <div key={index} className="border p-2 mt-2">
               <p>{ticket.type}</p>
               <p>Pris: {ticket.price} kr</p>
