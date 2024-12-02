@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { Events } from '@/types/Events'
+import Link from 'next/link';
 
 // Koden var ai generet men jobbet videre på den
 
@@ -38,16 +39,24 @@ export default function EventPage({ params }: { params: { "event-id": string } }
         <p>Lokasjon: {event.location}</p>
         <div>
           <h3>Billetter:</h3>
+          <div className="w-full flex justify-center space-x-4">
           {event.tickets?.map((ticket, index) => (
-            <div key={index} className="border p-2 mt-2">
-              <p>{ticket.type}</p>
-              <p>Pris: {ticket.price} kr</p>
-              <p>Tilgjengelige seter: {ticket.availableSeats}</p>
-              <button className="bg-blue-500 text-white px-4 py-2 mt-2">
-                Meld på
-              </button>
+            <div key={index} className="max-w-md border p-4 mt-4">
+              <div className="flex flex-col items-center justify-around ">
+                <p>{ticket.type}</p>
+                <div>
+                  <p className="block">Pris: {ticket.price} kr</p>
+                  <p className="block ml-2">Tilgjengelige seter: {ticket.availableSeats}</p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Link href={`${event.id}/form`} className="bg-blue-500 text-white px-4 py-2">
+                  Meld på
+                </Link>
+              </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
     </div>
