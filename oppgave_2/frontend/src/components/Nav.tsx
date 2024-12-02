@@ -7,7 +7,7 @@ export default function Nav() {
                 <Link href="/">Alle Arrangementer</Link>
             </li>
             <li className="border border-gray-300 p-2 rounded">
-                <Link href="/">Opprett Mal</Link>
+                <Link href="/opprett-mal">Opprett Mal</Link>
             </li>
             <li className="border border-gray-300 p-2 rounded">
                 <Link href="/">Opprett Arrangement</Link>
