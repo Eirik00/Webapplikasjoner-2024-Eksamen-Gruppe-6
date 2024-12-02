@@ -7,6 +7,7 @@ import React from "react";
 
 // TODO: Kommenter ut om du ikke ønsker å bruke tailwind
 import "../styles/tailwind/main.css";
+import Header from "@/components/Header";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Header />
         {children}
       </body>
     </html>

@@ -1,32 +1,27 @@
+import EventList from '@/components/EventList';
+import { Events } from '@/types/Events';
 import Link from 'next/link'
 
-const events = [
+const events: Events[] = [
   {
     id: 'concert-2024',
     title: 'Summer Music Festival',
-    date: '2024-07-15',
-    venue: 'City Stadium'
+    date: new Date('2024-07-15'),
+    type: 'Konsert',
+    description: 'An epic night of live music',
+    location: 'Halden',
+    tickets: [
+      { price: 50, type: 'General Admission', availableSeats: 1000 },
+      { price: 100, type: 'VIP', availableSeats: 200 }
+    ]
   },
-  // Add more events
 ];
 
 export default function Home() {
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-bold mb-6">Upcoming Events</h1>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {events.map((event) => (
-          <Link 
-            key={event.id} 
-            href={`/event/${event.id}`} 
-            className="border p-4 hover:bg-gray-100 transition"
-          >
-            <h2 className="text-2xl font-semibold">{event.title}</h2>
-            <p>Date: {event.date}</p>
-            <p>Venue: {event.venue}</p>
-          </Link>
-        ))}
-      </div>
+      <h1 className="text-4xl font-bold mb-6">Arrangementer</h1>
+      <EventList events={events} />
     </div>
   )
 }
