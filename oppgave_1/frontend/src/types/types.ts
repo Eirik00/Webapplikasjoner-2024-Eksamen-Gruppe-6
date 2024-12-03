@@ -17,8 +17,8 @@ export interface Course {
   }
   
   export interface Comment {
-    id: string;
-    createdBy: { id: string; name: string };
+    id?: string;
+    leksjonId: number;
+    createdBy: string;
     comment: string;
-    lesson: { slug: string };
   }
