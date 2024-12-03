@@ -75,6 +75,7 @@ app.put("/events/:id", async (c) => {
     const updatedEvent = {
       ...eventList[eventIndex],
       ...updatedEventData,
+      date: new Date(updatedEventData.date),
     };
 
     const validatedEvent = EventSchema.parse(updatedEvent);
