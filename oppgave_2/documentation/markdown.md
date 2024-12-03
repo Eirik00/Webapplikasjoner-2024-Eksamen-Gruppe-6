@@ -86,6 +86,52 @@ Her er en oversikt over API-endepunktene og deres funksjonalitet.
 ### Filtrering
 Arrangementer sorteres først på år og måned, og så på type etter hva som søkes på. Filtreringen skjer ved at brukeren skriver inn en søketekst i et input-felt. Arrangementene blir deretter filtrert basert på om arrangementstypen inneholder søketeksten (case-insensitive).
 
+### Opprette / Gjenbruke en Mal
+
+For å opprette og gjenbruke en mal i applikasjonen, følg disse trinnene:
+
+#### Opprette en Mal
+
+Naviger til Opprett Mal-siden:
+
+1. Gå til `/opprett-mal` siden i applikasjonen.
+
+Fyll ut Mal-skjemaet:
+
+- **Navn på mal:** Skriv inn et navn for malen.
+- **Tillat arrangementer på samme dag:** Kryss av hvis arrangementer kan holdes på samme dag.
+- **Hvilke Dager:** Velg hvilke dager arrangementene kan holdes.
+- **Fast pris:** Kryss av hvis prisen skal være fast, og skriv inn prisen.
+- **Begrenset antall plasser:** Kryss av hvis det er begrenset antall plasser, og skriv inn antall plasser.
+- **Venteliste:** Kryss av hvis det skal være venteliste.
+- **Privat:** Kryss av hvis arrangementet skal være privat.
+
+Lagre Malen:
+
+- Klikk på "Lagre Mal" knappen for å lagre malen.
+- Malen blir sendt til backend via en POST-forespørsel til `/mals` endepunktet.
+
+#### Gjenbruke en Mal
+
+Naviger til Opprett Arrangement-siden:
+
+1. Gå til `/opprett-arrangement` siden i applikasjonen.
+
+Velg en Mal:
+
+- Velg en eksisterende mal fra listen over tilgjengelige maler.
+- Malen blir brukt til å forhåndsutfylle arrangementsskjemaet med informasjonen fra malen.
+
+Tilpass Arrangementet:
+
+- Gjør eventuelle nødvendige endringer i arrangementsskjemaet.
+- Fyll ut eventuelle tilleggskrav som ikke er dekket av malen.
+
+Lagre Arrangementet:
+
+- Klikk på "Lagre Arrangement" knappen for å lagre arrangementet.
+- Arrangementet blir sendt til backend via en POST-forespørsel til `/events` endepunktet.
+
 ### Datamodeller
 
 #### Event
