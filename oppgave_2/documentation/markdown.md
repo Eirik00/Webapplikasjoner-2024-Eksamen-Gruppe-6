@@ -96,7 +96,7 @@ Naviger til Opprett Mal-siden:
 
 1. Gå til `/opprett-mal` siden i applikasjonen.
 
-Fyll ut Mal-skjemaet:
+2. Fyll ut Mal-skjemaet:
 
 - **Navn på mal:** Skriv inn et navn for malen.
 - **Tillat arrangementer på samme dag:** Kryss av hvis arrangementer kan holdes på samme dag.
@@ -106,7 +106,7 @@ Fyll ut Mal-skjemaet:
 - **Venteliste:** Kryss av hvis det skal være venteliste.
 - **Privat:** Kryss av hvis arrangementet skal være privat.
 
-Lagre Malen:
+3. Lagre Malen:
 
 - Klikk på "Lagre Mal" knappen for å lagre malen.
 - Malen blir sendt til backend via en POST-forespørsel til `/mals` endepunktet.
@@ -117,17 +117,17 @@ Naviger til Opprett Arrangement-siden:
 
 1. Gå til `/opprett-arrangement` siden i applikasjonen.
 
-Velg en Mal:
+2. Velg en Mal:
 
 - Velg en eksisterende mal fra listen over tilgjengelige maler.
 - Malen blir brukt til å forhåndsutfylle arrangementsskjemaet med informasjonen fra malen.
 
-Tilpass Arrangementet:
+3. Tilpass Arrangementet:
 
 - Gjør eventuelle nødvendige endringer i arrangementsskjemaet.
 - Fyll ut eventuelle tilleggskrav som ikke er dekket av malen.
 
-Lagre Arrangementet:
+4. Lagre Arrangementet:
 
 - Klikk på "Lagre Arrangement" knappen for å lagre arrangementet.
 - Arrangementet blir sendt til backend via en POST-forespørsel til `/events` endepunktet.
