@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import React from "react";
 
 // TODO: Kommenter ut om du ønsker å bruke .css
 // import '../styles/scss/main.css'
 
 // TODO: Kommenter ut om du ikke ønsker å bruke tailwind
 import "../styles/tailwind/main.css";
+import Header from "@/components/Header";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,9 +35,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Header />
         {children}
       </body>
     </html>
   );
 }
-import React from "react";
