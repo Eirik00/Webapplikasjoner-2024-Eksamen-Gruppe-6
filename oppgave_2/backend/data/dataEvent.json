@@ -1,0 +1,35 @@
+[
+  {
+    "id": "069c9c8f-8c9f-426d-96ef-548338c72a9b",
+    "title": "Øynstein Sunde Konsert",
+    "date": "2025-01-20T00:00:00.000Z",
+    "type": "Konsert",
+    "description": "Øynstein Sunde kommer til Haldenscene for å holde en morsom og spennende konsert. Ta med latter og godt humør :)",
+    "location": "Halden",
+    "tickets": [
+      {
+        "price": 299,
+        "type": "Standard",
+        "availableSeats": 196,
+        "person": [
+          {
+            "name": "Eirik",
+            "telephone": "123"
+          },
+          {
+            "name": "Peter",
+            "telephone": "123"
+          },
+          {
+            "name": "Jens",
+            "telephone": "123"
+          },
+          {
+            "name": "Martin",
+            "telephone": "123"
+          }
+        ]
+      }
+    ]
+  }
+]

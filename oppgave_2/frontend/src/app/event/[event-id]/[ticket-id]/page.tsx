@@ -1,18 +1,75 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Events } from '@/types/types';
 
-const PaaMeldingPage = () => {
+const PaaMeldingPage = ({ params }: { params: { "event-id": string, "ticket-id": string } }) => {
   const router = useRouter();
+  const eventId = params["event-id"];
+  const ticketId = params["ticket-id"];
   const [numPeople, setNumPeople] = useState<number>(1);
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [pricePerPerson, setPricePerPerson] = useState<number>(0);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:3999/events/${eventId}`);
+        const event: Events = await response.json();
+        
+        const ticket = event.tickets.find((ticket) => ticket.type === ticketId);
+        if(ticket){
+          setPricePerPerson(ticket.price);
+        }else{
+          console.error('Ticket not found');
+        }
+      } catch (error) { 
+        console.error('Error:', error);
+      }
+    };
+
+    fetchEventDetails();
+  }, [eventId]);
+
+  useEffect(() => {
+    setTotalPrice(numPeople * pricePerPerson);
+  }, [numPeople, pricePerPerson]);
 
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    console.log(formData);
-    router.push('/opprett-arrangement');
+
+    const peopleData = Array.from({ length: numPeople }, (_, index) => ({
+        name: formData[`name${index}`],
+        telephone: formData[`phone${index}`],
+    }));
+
+    try {
+        const response = await fetch(`http://localhost:3999/events/${eventId}/join/${ticketId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(peopleData),
+        });
+
+        const responseText = await response.text();
+        console.log('Response Text:', responseText);
+
+        if (!response.ok) {
+            const errorData = JSON.parse(responseText);
+            console.error('Error:', errorData);
+            return;
+        }
+
+        const result = JSON.parse(responseText);
+        console.log('Success:', result);
+        router.push('/');
+    } catch (error) {
+        console.error('Error:', error);
+    }
   };
 
   const handleNumPeopleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +113,7 @@ const PaaMeldingPage = () => {
                         onChange={(e) => 
                             handleInputChange(e, `name${index}`)
                         }
-                        placeholder={`Navn person ${index}`}
+                        placeholder={`Navn person ${index+1}`}
                         className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <label className="block mb-2 font-medium">
@@ -68,15 +125,16 @@ const PaaMeldingPage = () => {
                         onChange={(e) => 
                             handleInputChange(e, `phone${index}`)
                         }
-                        placeholder={`Tlf. person ${index}`}
+                        placeholder={`Tlf. person ${index+1}`}
                         className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     {index < numPeople - 1 && <hr className="my-4" />}
                 </div>
             ))
         }
+        <p>Total Pris: {totalPrice}.- Kr</p>
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
-          Lagre Mal
+          Meld På
         </button>
       </form>
     </div>
