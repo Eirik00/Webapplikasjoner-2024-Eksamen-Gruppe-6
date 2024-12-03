@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useCourse from "../hooks/useCourse";
 import type { Comment, Lesson, Course } from "../types/types";
+import { useParams } from "react-router-dom";
 
 export default function Lesson() {
     const [success, setSuccess] = useState(false);
@@ -12,8 +13,11 @@ export default function Lesson() {
     
     const [lesson, setLesson] = useState<Lesson | null>(null);
     const [course, setCourse] = useState<Course | null>(null);
-    const courseSlug = "javascript-101";
-    const lessonSlug = "variabler";
+
+    const { courseSlug, lessonSlug } = useParams<{
+      courseSlug: string | undefined;
+      lessonSlug: string | undefined;
+    }>();
   
     const { getLesson, getComments, createComment, getCourse } = useCourse();
 
@@ -25,23 +29,28 @@ export default function Lesson() {
       setName(event.target.value);
     };
   
+        if (!courseSlug || !lessonSlug) {
+          console.error("Missing courseSlug or lessonSlug");
+          return;
+        }
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       setFormError(false);
       setSuccess(false);
+      const leksjonId = await fetchLeksjonId(courseSlug, lessonSlug);
+
       if (!comment || !name) {
         setFormError(true);
       } else {
+        const createdBy = name;
+
         await createComment({
-          id: `${Math.floor(Math.random() * 1000 + 1)}`,
-          createdBy: {
-            id: Math.floor(Math.random() * 1000 + 1).toString(),
-            name,
-          },
-          comment,
-          lesson: { slug: lessonSlug },
+          leksjonId,
+          createdBy,
+          comment
         });
-        const commentsData = await getComments(lessonSlug);
+        const commentsData = await getComments(courseSlug, lessonSlug);
         setComments(commentsData);
         setSuccess(true);
       }
@@ -51,7 +60,7 @@ export default function Lesson() {
       const getContent = async () => {
         const lessonData = await getLesson(courseSlug, lessonSlug);
         const courseData = await getCourse(courseSlug) as Course;
-        const commentsData = await getComments(lessonSlug);
+        const commentsData = await getComments(courseSlug, lessonSlug);
         setLesson(lessonData);
         setCourse(courseData);
         setComments(commentsData);
@@ -59,6 +68,15 @@ export default function Lesson() {
       getContent();
     }, [courseSlug, lessonSlug]);
   
+    const fetchLeksjonId = async (courseSlug: string, lessonSlug: string): Promise<number> => {
+      const response = await fetch(`/kurs/${courseSlug}/${lessonSlug}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch lesson: ${response.statusText}`);
+      }
+      const lesson = await response.json();
+      return lesson.id;
+    };
+
     return (
       <div>
         <div className="flex justify-between">
@@ -149,7 +167,7 @@ export default function Lesson() {
                     key={c.id}
                   >
                     <h5 data-testid="user_comment_name" className="font-bold">
-                      {c.createdBy.name}
+                      {c.createdBy}
                     </h5>
                     <p data-testid="user_comment">{c.comment}</p>
                   </li>
