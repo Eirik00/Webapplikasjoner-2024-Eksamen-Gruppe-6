@@ -51,5 +51,21 @@
         "person": []
       }
     ]
+  },
+  {
+    "id": "7f402d97-a951-40f0-9e18-6e550e46eef4",
+    "title": "test2",
+    "date": "2024-12-03T18:05:54.238Z",
+    "type": "test2",
+    "description": "test2",
+    "location": "",
+    "tickets": [
+      {
+        "price": 41,
+        "type": "",
+        "availableSeats": 200,
+        "person": []
+      }
+    ]
   }
 ]
