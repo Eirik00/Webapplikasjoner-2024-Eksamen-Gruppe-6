@@ -1,13 +1,41 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Events } from '@/types/types';
 
-const PaaMeldingPage = ({ params }: { params: { "event-id": string } }) => {
+const PaaMeldingPage = ({ params }: { params: { "event-id": string, "ticket-id": string } }) => {
   const router = useRouter();
   const eventId = params["event-id"];
+  const ticketId = params["ticket-id"];
   const [numPeople, setNumPeople] = useState<number>(1);
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [pricePerPerson, setPricePerPerson] = useState<number>(0);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:3999/events/${eventId}`);
+        const event: Events = await response.json();
+        
+        const ticket = event.tickets.find((ticket) => ticket.type === ticketId);
+        if(ticket){
+          setPricePerPerson(ticket.price);
+        }else{
+          console.error('Ticket not found');
+        }
+      } catch (error) { 
+        console.error('Error:', error);
+      }
+    };
+
+    fetchEventDetails();
+  }, [eventId]);
+
+  useEffect(() => {
+    setTotalPrice(numPeople * pricePerPerson);
+  }, [numPeople, pricePerPerson]);
 
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
@@ -19,7 +47,7 @@ const PaaMeldingPage = ({ params }: { params: { "event-id": string } }) => {
     }));
 
     try {
-        const response = await fetch(`http://localhost:3999/events/${eventId}/join`, {
+        const response = await fetch(`http://localhost:3999/events/${eventId}/join/${ticketId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,6 +132,7 @@ const PaaMeldingPage = ({ params }: { params: { "event-id": string } }) => {
                 </div>
             ))
         }
+        <p>Total Pris: {totalPrice}.- Kr</p>
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
           Meld På
         </button>

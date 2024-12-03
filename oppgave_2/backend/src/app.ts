@@ -39,13 +39,16 @@ app.get("/events/:id", (c) => {
 
 app.post("/events", async (c) => {
   try {
-    const newEventData = await c.req.json();
+    const newEventData: Event = await c.req.json();
     
     // Initialize the person field as an empty array
     const event = EventSchema.parse({
       ...newEventData,
       date: new Date(newEventData.date),
-      person: [],
+      tickets: newEventData.tickets.map((ticket) => ({
+        ...ticket,
+        person: [],
+      })),
     });
     eventList.push(event);
 
@@ -105,8 +108,9 @@ app.delete("/events/:id", (c) => {
   return c.json({ message: "Event deleted successfully" });
 });
 
-app.post("/events/:id/join", async (c) => {
+app.post("/events/:id/join/:ticketid", async (c) => {
   const id = c.req.param("id");
+  const ticketId = c.req.param("ticketid");
   const personDataList = await c.req.json();
 
   const eventIndex = eventList.findIndex((event) => event.id === id);
@@ -128,14 +132,15 @@ app.post("/events/:id/join", async (c) => {
 
     eventList[eventIndex] = {
       ...event,
-      person: [...event.person, ...validPersons],
       tickets: event.tickets.map(ticket => {
-        const seatsToTake = Math.min(ticket.availableSeats, totalSeatsRequested);
-        totalSeatsRequested -= seatsToTake;
+      if (ticket.type === ticketId) {
         return {
-          ...ticket,
-          availableSeats: ticket.availableSeats - seatsToTake,
+        ...ticket,
+        availableSeats: ticket.availableSeats - totalSeatsRequested,
+        person: [...ticket.person, ...validPersons],
         };
+      }
+      return ticket;
       }),
     };
 

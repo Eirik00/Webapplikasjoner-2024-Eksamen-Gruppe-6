@@ -17,10 +17,10 @@ export const EventSchema = z.object({
       price: z.number(),
       type: z.string(),
       availableSeats: z.number(),
-    })
-  ),
-  person: z.array(
-    PersonSchema
+      person: z.array(
+        PersonSchema
+      ),
+    }),
   ),
 });
 

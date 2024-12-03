@@ -73,7 +73,7 @@ export default function EventPage({ params }: { params: { "event-id": string } }
                 </div>
               </div>
               <div className="mt-4">
-                <Link href={`${event.id}/form`} className="bg-blue-500 text-white px-4 py-2">
+                <Link href={`${event.id}/${ticket.type}`} className="bg-blue-500 text-white px-4 py-2">
                   Meld på
                 </Link>
               </div>
