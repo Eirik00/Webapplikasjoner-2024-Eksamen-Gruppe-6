@@ -1,4 +1,5 @@
-# Dokumentasjon 
+# Dokumentasjon
+
 ## Oppgave 1
 
 ### API-endepunkter
@@ -15,18 +16,61 @@ Her er en oversikt over API-endepunktene og deres funksjonalitet.
 | GET    | **`/mals`**                     | Henter alle maler.                                                                            |
 | POST   | **`/mals`**                     | Oppretter en ny mal.                                                                          |
 
-#### GET 
-Denne skal brukes til å hente ut informasjon. Det vil da gi en repsons 200 med json knyttet til informasjonen ønsket.
-Hvis det ikke skulle finnes informasjon tilknyttet vil det gis et 404, om det er feil med uthenting vil det gis 500
+#### GET `/events`
+- **Beskrivelse:** Henter alle arrangementer.
+- **Respons:** 
+  - **200:** Returnerer en liste over arrangementer.
+  - **500:** Feil ved uthenting av data.
 
-#### POST 
-Denne brukes til å sende/legge til informasjon i databasen/api-et. Det vil trenge et json dokument tilsendt i protokollen, om det er gyldig vil det sendes 201 repsons tilbake for å signalisere at backend mottokk dataen som ble sendt. Om dataen ikke er formatert riktig så sendes det en 400 kode, og om det skjer noe galt på backenden så sendes det 500
+#### GET `/events/:id`
+- **Beskrivelse:** Henter et spesifikt arrangement basert på ID.
+- **Respons:** 
+  - **200:** Returnerer arrangementet.
+  - **404:** Arrangementet ble ikke funnet.
+  - **500:** Feil ved uthenting av data.
 
-#### DELETE 
-Denne skal brukes til å fjærne data fra databasen/api-et. Det vil trenge informasjon angående hva som skal slettes, i form av en id f.eks. Blir dataen slettet korrekt gir det en 200 repsons. Er det feil referat til data gir det 404 respons og er det en feil på backend så blir det en 500 respons.
+#### POST `/events`
+- **Beskrivelse:** Oppretter et nytt arrangement.
+- **Respons:** 
+  - **201:** Arrangementet ble opprettet.
+  - **400:** Ugyldig data.
+  - **500:** Feil ved opprettelse av data.
 
-#### PUT 
-Denne skal brukes til å oppdatere informasjon på databasen/api-et. Det vil trenge json data samt en identifikator til hva slags data som skal endres. Om allt er gyldig så blir det sendt en 200 repsons. Er det feil formatert data eller at referansen ikke viser til noe data så blir det sendt 404 response og er det noe feil med backend så blir det en 500 respons
+#### PUT `/events/:id`
+- **Beskrivelse:** Oppdaterer et spesifikt arrangement basert på ID.
+- **Respons:** 
+  - **200:** Arrangementet ble oppdatert.
+  - **404:** Arrangementet ble ikke funnet.
+  - **400:** Ugyldig data.
+  - **500:** Feil ved oppdatering av data.
+
+#### DELETE `/events/:id`
+- **Beskrivelse:** Sletter et spesifikt arrangement basert på ID.
+- **Respons:** 
+  - **200:** Arrangementet ble slettet.
+  - **404:** Arrangementet ble ikke funnet.
+  - **500:** Feil ved sletting av data.
+
+#### POST `/events/:id/join/:ticketid`
+- **Beskrivelse:** Legger til personer til et spesifikt arrangement og billettype basert på ID og billettype-ID.
+- **Respons:** 
+  - **200:** Personene ble lagt til.
+  - **404:** Arrangementet eller billettypen ble ikke funnet.
+  - **400:** Ugyldig data eller ingen ledige plasser.
+  - **500:** Feil ved oppdatering av data.
+
+#### GET `/mals`
+- **Beskrivelse:** Henter alle maler.
+- **Respons:** 
+  - **200:** Returnerer en liste over maler.
+  - **500:** Feil ved uthenting av data.
+
+#### POST `/mals`
+- **Beskrivelse:** Oppretter en ny mal.
+- **Respons:** 
+  - **201:** Malen ble opprettet.
+  - **400:** Ugyldig data.
+  - **500:** Feil ved opprettelse av data.
 
 ### Sider
 
@@ -39,9 +83,85 @@ Denne skal brukes til å oppdatere informasjon på databasen/api-et. Det vil tre
 | **`/events/:id`**               | Side for visning av et spesifikt arrangement.                                           |
 | **`/events/:id/join/:ticketid`**| Side for å legge til personer til et spesifikt arrangement og billettype.               |
 
-
 ### Filtrering
-Arrangementer sorteres først på år og måned, og så på type etter hva som søkes på.
+Arrangementer sorteres først på år og måned, og så på type etter hva som søkes på. Filtreringen skjer ved at brukeren skriver inn en søketekst i et input-felt. Arrangementene blir deretter filtrert basert på om arrangementstypen inneholder søketeksten (case-insensitive).
 
-### Datamodellen
+### Datamodeller
 
+#### Event
+```typescript
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  type: string;
+  description: string;
+  location: string;
+  tickets: Ticket[];
+}
+
+interface Ticket {
+  price: number;
+  type: string;
+  availableSeats: number;
+  person: Person[];
+}
+
+interface Person {
+  name: string;
+  telephone: string;
+}
+
+interface Mal {
+  id: string;
+  title: string;
+  eventOnSameDay: boolean;
+  selectedWeekdays: string[];
+  lockedPrice: boolean;
+  price: number;
+  limitedAvailability: boolean;
+  availableSeats: number;
+  waitingList: boolean;
+  private: boolean;
+}
+```
+
+#### Database Modell
+```sql
+CREATE TABLE events (
+  id VARCHAR PRIMARY KEY,
+  title VARCHAR,
+  date TIMESTAMP,
+  type VARCHAR,
+  description TEXT,
+  location VARCHAR
+);
+
+CREATE TABLE tickets (
+  id SERIAL PRIMARY KEY,
+  event_id VARCHAR REFERENCES events(id),
+  price NUMERIC,
+  type VARCHAR,
+  availableSeats INTEGER
+);
+
+CREATE TABLE persons (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER REFERENCES tickets(id),
+  name VARCHAR,
+  telephone VARCHAR
+);
+
+CREATE TABLE mals (
+  id VARCHAR PRIMARY KEY,
+  title VARCHAR,
+  eventOnSameDay BOOLEAN,
+  selectedWeekdays TEXT[],
+  lockedPrice BOOLEAN,
+  price NUMERIC,
+  limitedAvailability BOOLEAN,
+  availableSeats INTEGER,
+  waitingList BOOLEAN,
+  private BOOLEAN
+);
+```
