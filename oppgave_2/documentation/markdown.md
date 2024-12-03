@@ -45,3 +45,129 @@ Arrangementer sorteres først på år og måned, og så på type etter hva som s
 
 ### Datamodellen
 
+<<<<<<< Updated upstream
+=======
+For å opprette og gjenbruke en mal i applikasjonen, følg disse trinnene:
+
+#### Opprette en Mal
+
+Naviger til Opprett Mal-siden:
+
+1. Gå til `/opprett-mal` siden i applikasjonen.
+
+2. Fyll ut Mal-skjemaet:
+
+- **Navn på mal:** Skriv inn et navn for malen.
+- **Tillat arrangementer på samme dag:** Kryss av hvis arrangementer kan holdes på samme dag.
+- **Hvilke Dager:** Velg hvilke dager arrangementene kan holdes.
+- **Fast pris:** Kryss av hvis prisen skal være fast, og skriv inn prisen.
+- **Begrenset antall plasser:** Kryss av hvis det er begrenset antall plasser, og skriv inn antall plasser.
+- **Venteliste:** Kryss av hvis det skal være venteliste.
+- **Privat:** Kryss av hvis arrangementet skal være privat.
+
+3. Lagre Malen:
+
+- Klikk på "Lagre Mal" knappen for å lagre malen.
+- Malen blir sendt til backend via en POST-forespørsel til `/mals` endepunktet.
+
+#### Gjenbruke en Mal
+
+Naviger til Opprett Arrangement-siden:
+
+1. Gå til `/opprett-arrangement` siden i applikasjonen.
+
+2. Velg en Mal:
+
+- Velg en eksisterende mal fra listen over tilgjengelige maler.
+- Malen blir brukt til å forhåndsutfylle arrangementsskjemaet med informasjonen fra malen.
+
+3. Tilpass Arrangementet:
+
+- Gjør eventuelle nødvendige endringer i arrangementsskjemaet.
+- Fyll ut eventuelle tilleggskrav som ikke er dekket av malen.
+
+4. Lagre Arrangementet:
+
+- Klikk på "Lagre Arrangement" knappen for å lagre arrangementet.
+- Arrangementet blir sendt til backend via en POST-forespørsel til `/events` endepunktet.
+
+### Datamodeller
+
+#### Event
+```typescript
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  type: string;
+  description: string;
+  location: string;
+  tickets: Ticket[];
+}
+
+interface Ticket {
+  price: number;
+  type: string;
+  availableSeats: number;
+  person: Person[];
+}
+
+interface Person {
+  name: string;
+  telephone: string;
+}
+
+interface Mal {
+  id: string;
+  title: string;
+  eventOnSameDay: boolean;
+  selectedWeekdays: string[];
+  lockedPrice: boolean;
+  price: number;
+  limitedAvailability: boolean;
+  availableSeats: number;
+  waitingList: boolean;
+  private: boolean;
+}
+```
+
+#### Database Modell
+```sql
+CREATE TABLE events (
+  id VARCHAR PRIMARY KEY,
+  title VARCHAR,
+  date TIMESTAMP,
+  type VARCHAR,
+  description TEXT,
+  location VARCHAR
+);
+
+CREATE TABLE tickets (
+  id SERIAL PRIMARY KEY,
+  event_id VARCHAR REFERENCES events(id),
+  price NUMERIC,
+  type VARCHAR,
+  availableSeats INTEGER
+);
+
+CREATE TABLE persons (
+  id SERIAL PRIMARY KEY,
+  ticket_id INTEGER REFERENCES tickets(id),
+  name VARCHAR,
+  telephone VARCHAR
+);
+
+CREATE TABLE mals (
+  id VARCHAR PRIMARY KEY,
+  title VARCHAR,
+  eventOnSameDay BOOLEAN,
+  selectedWeekdays TEXT[],
+  lockedPrice BOOLEAN,
+  price NUMERIC,
+  limitedAvailability BOOLEAN,
+  availableSeats INTEGER,
+  waitingList BOOLEAN,
+  private BOOLEAN
+);
+```
+>>>>>>> Stashed changes
