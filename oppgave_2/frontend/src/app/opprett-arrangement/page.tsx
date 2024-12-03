@@ -9,6 +9,7 @@ const OpprettArrangementPage = () => {
     const [selectedType, setSelectedType] = useState<string>('');
     const [eventTypes, setEventTypes] = useState<string[]>([]);
     const [mals, setMals] = useState<any[]>([]);
+    const [ticketTypes, setTicketTypes] = useState<number>(1);
     const [formData, setFormData] = useState<Events>({
         id: uuidv4(),
         title: '',
@@ -24,6 +25,10 @@ const OpprettArrangementPage = () => {
             },
         ],
     });
+
+    const calculateTotalSeats = () => {
+        return formData.tickets.reduce((total, ticket) => total + ticket.availableSeats, 0);
+    };
 
     const fetchEventTypes = async () => {
         try {
@@ -50,13 +55,19 @@ const OpprettArrangementPage = () => {
         const selectedMal = mals.find((mal) => mal.title === selectedTitle);
         if (selectedMal) {
             setFormData({
+                ...formData,
                 title: selectedMal.title || '',
                 type: selectedMal.type || '',
                 description: selectedMal.description || '',
-                price: selectedMal.price || 0,
-                availableSeats: selectedMal.availableSeats || 0,
                 location: selectedMal.location || '',
-                date: selectedMal.date || '',
+                date: selectedMal.date ? new Date(selectedMal.date) : new Date(),
+                tickets: [
+                    {
+                        price: selectedMal.price || 0,
+                        type: '',
+                        availableSeats: selectedMal.availableSeats || 0,
+                    },
+                ],
             });
         }
     };
@@ -69,25 +80,60 @@ const OpprettArrangementPage = () => {
         }));
     };
 
+    const handleAddTickets = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const numberOfTickets = Number(value);
+
+        if (value === "" || numberOfTickets < 1) {
+            setTicketTypes(1);
+            setFormData((prev) => ({
+                ...prev,
+                tickets: [
+                    {
+                        price: 0,
+                        type: '',
+                        availableSeats: 0,
+                    },
+                ],
+            }));
+        }else{
+            setTicketTypes(numberOfTickets);
+            const newTickets = Array.from({ length: numberOfTickets }, () => ({
+                price: 0,
+                type: '',
+                availableSeats: 0,
+            }));
+            setFormData((prev) => ({
+                ...prev,
+                tickets: newTickets,
+            }));
+        }
+    };
+
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-
-        console.log(formData);
+    
+        const eventData = {
+            ...formData,
+            date: new Date(formData.date), // Ensure date is in the correct format
+        };
+    
+        console.log(eventData);
         try {
             const response = await fetch('http://localhost:3999/events', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(eventData),
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error('Error:', errorData);
                 return;
             }
-
+    
             const result = await response.json();
             console.log('Success:', result);
             router.push('/opprett-arrangement');
@@ -149,8 +195,15 @@ const OpprettArrangementPage = () => {
                         <input
                             type="number"
                             id="price"
-                            value={formData.price}
-                            onChange={handleChange}
+                            value={formData.tickets[0].price}
+                            onChange={(e) => {
+                                const newTickets = [...formData.tickets];
+                                newTickets[0].price = Number(e.target.value);
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    tickets: newTickets,
+                                }));
+                            }}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <span className="ml-2">Kr.</span>
@@ -160,9 +213,9 @@ const OpprettArrangementPage = () => {
                     <label className="block text-sm font-medium mb-2">Plasser:</label>
                     <input
                         type="number"
-                        id="availableSeats"
-                        value={formData.availableSeats}
-                        onChange={handleChange}
+                        id="totalSeats"
+                        value={calculateTotalSeats()}
+                        readOnly
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
@@ -181,11 +234,73 @@ const OpprettArrangementPage = () => {
                     <input
                         type="date"
                         id="date"
-                        value={formData.date}
+                        value={new Date(formData.date).toISOString().split('T')[0]}
                         onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
+                <div>
+                    <label className="block text-sm font-medium mb-2">Antall billettyper:</label>
+                    <input
+                        type="number"
+                        onChange={handleAddTickets}
+                        min={1}
+                        value={ticketTypes}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                {formData.tickets.map((ticket, index) => (
+                    <div key={index} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-2">Billettype {index + 1} Pris:</label>
+                            <input
+                                type="number"
+                                value={ticket.price}
+                                onChange={(e) => {
+                                    const newTickets = [...formData.tickets];
+                                    newTickets[index].price = Number(e.target.value);
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        tickets: newTickets,
+                                    }));
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-2">Billettype {index + 1} Type:</label>
+                            <input
+                                type="text"
+                                value={ticket.type}
+                                onChange={(e) => {
+                                    const newTickets = [...formData.tickets];
+                                    newTickets[index].type = e.target.value;
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        tickets: newTickets,
+                                    }));
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-2">Billettype {index + 1} Plasser:</label>
+                            <input
+                                type="number"
+                                value={ticket.availableSeats}
+                                onChange={(e) => {
+                                    const newTickets = [...formData.tickets];
+                                    newTickets[index].availableSeats = Number(e.target.value);
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        tickets: newTickets,
+                                    }));
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                ))}
                 <button
                     type="submit"
                     className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"

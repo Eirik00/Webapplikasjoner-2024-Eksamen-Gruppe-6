@@ -25,3 +25,4 @@ export const EventSchema = z.object({
 });
 
 export type Event = z.infer<typeof EventSchema>;
+export type Person = z.infer<typeof PersonSchema>;

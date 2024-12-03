@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { z } from "zod";
-import { Event, EventSchema, PersonSchema } from "./types/eventSchema";
+import { Event, EventSchema, Person, PersonSchema } from "./types/eventSchema";
 import { Mal, MalSchema } from "./types/malSchema";
 
 const app = new Hono();
@@ -44,6 +44,7 @@ app.post("/events", async (c) => {
     // Initialize the person field as an empty array
     const event = EventSchema.parse({
       ...newEventData,
+      date: new Date(newEventData.date),
       person: [],
     });
     eventList.push(event);
@@ -105,7 +106,7 @@ app.delete("/events/:id", (c) => {
 
 app.post("/events/:id/join", async (c) => {
   const id = c.req.param("id");
-  const personData = await c.req.json();
+  const personDataList = await c.req.json();
 
   const eventIndex = eventList.findIndex((event) => event.id === id);
   
@@ -114,23 +115,27 @@ app.post("/events/:id/join", async (c) => {
   }
 
   try {
-    const validPerson = PersonSchema.parse(personData);
-    
-    const event = eventList[eventIndex];
-    const availableTickets = event.tickets.some(ticket => ticket.availableSeats > 0);
+    const validPersons = personDataList.map((personData: Person) => PersonSchema.parse(personData));
 
-    if (!availableTickets) {
+    const event = eventList[eventIndex];
+    var totalSeatsRequested = validPersons.length;
+    const availableTickets = event.tickets.reduce((total, ticket) => total + ticket.availableSeats, 0);
+
+    if (totalSeatsRequested > availableTickets) {
       return c.json({ error: "No available seats" }, { status: 400 });
     }
 
     eventList[eventIndex] = {
       ...event,
-      person: [...event.person, validPerson],
-      tickets: event.tickets.map(ticket => 
-        ticket.availableSeats > 0 
-          ? { ...ticket, availableSeats: ticket.availableSeats - 1 } 
-          : ticket
-      )
+      person: [...event.person, ...validPersons],
+      tickets: event.tickets.map(ticket => {
+        const seatsToTake = Math.min(ticket.availableSeats, totalSeatsRequested);
+        totalSeatsRequested -= seatsToTake;
+        return {
+          ...ticket,
+          availableSeats: ticket.availableSeats - seatsToTake,
+        };
+      }),
     };
 
     return c.json(eventList[eventIndex]);
