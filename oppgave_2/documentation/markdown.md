@@ -45,8 +45,6 @@ Arrangementer sorteres først på år og måned, og så på type etter hva som s
 
 ### Datamodellen
 
-<<<<<<< Updated upstream
-=======
 For å opprette og gjenbruke en mal i applikasjonen, følg disse trinnene:
 
 #### Opprette en Mal
@@ -170,4 +168,3 @@ CREATE TABLE mals (
   private BOOLEAN
 );
 ```
->>>>>>> Stashed changes
