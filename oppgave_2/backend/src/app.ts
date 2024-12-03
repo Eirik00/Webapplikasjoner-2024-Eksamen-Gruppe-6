@@ -3,10 +3,11 @@ import { cors } from "hono/cors";
 import { z } from "zod";
 import { Event, EventSchema, Person, PersonSchema } from "./types/eventSchema";
 import { Mal, MalSchema } from "./types/malSchema";
+import { readEventData, readMalData, writeEventData, writeMalData } from "./lib/storage";
 
 const app = new Hono();
-const eventList: Event[] = [];
-const malList: Mal[] = [];
+let eventList: Event[] = readEventData();
+let malList: Mal[] = readMalData();
 
 app.use("/*", cors());
 
@@ -51,6 +52,7 @@ app.post("/events", async (c) => {
       })),
     });
     eventList.push(event);
+    writeEventData(eventList);
 
     return c.json<Event>(event, { status: 201 });
   } catch (error) {
@@ -84,6 +86,7 @@ app.put("/events/:id", async (c) => {
     const validatedEvent = EventSchema.parse(updatedEvent);
     eventList[eventIndex] = validatedEvent;
 
+    writeEventData(eventList);
     return c.json<Event>(validatedEvent);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -105,6 +108,7 @@ app.delete("/events/:id", (c) => {
   }
 
   eventList.splice(eventIndex, 1);
+  writeEventData(eventList);
   return c.json({ message: "Event deleted successfully" });
 });
 
@@ -144,6 +148,7 @@ app.post("/events/:id/join/:ticketid", async (c) => {
       }),
     };
 
+    writeEventData(eventList);
     return c.json(eventList[eventIndex]);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -165,6 +170,7 @@ app.post("/mals", async (c) => {
     const newMalData = await c.req.json();
     const mal = MalSchema.parse(newMalData);
     malList.push(mal);
+    writeMalData(malList);
     return c.json<Mal>(mal, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

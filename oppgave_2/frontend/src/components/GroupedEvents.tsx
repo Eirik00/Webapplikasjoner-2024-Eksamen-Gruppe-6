@@ -4,6 +4,7 @@ import EventList from './EventList';
 
 interface GroupedEventsProps {
   events: Events[];
+  admin: boolean;
 }
 
 function groupEventsByYearAndMonth(events: Events[]) {
@@ -28,7 +29,7 @@ function groupEventsByYearAndMonth(events: Events[]) {
     return groupedEvents;
 }
 
-const GroupedEvents: React.FC<GroupedEventsProps> = ({ events }) => {
+const GroupedEvents: React.FC<GroupedEventsProps> = ({ events, admin }) => {
   const groupedEvents = groupEventsByYearAndMonth(events);
 
   return (
@@ -39,7 +40,7 @@ const GroupedEvents: React.FC<GroupedEventsProps> = ({ events }) => {
           {Object.keys(groupedEvents[year]).map(month => (
             <div key={month}>
               <h3 className="text-xl font-semibold mt-2">{month}:</h3>
-              <EventList events={groupedEvents[year][month]} />
+              <EventList events={groupedEvents[year][month]} admin={admin} />
             </div>
           ))}
         </div>

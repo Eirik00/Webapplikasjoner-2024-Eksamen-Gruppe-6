@@ -11,3 +11,16 @@ export interface Events {
     availableSeats: number;
   }[];
 }
+
+export interface Mal {
+  id: string;
+  title: string;
+  eventOnSameDay: boolean;
+  selectedWeekdays: string[];
+  lockedPrice: boolean;
+  price: number;
+  limitedAvailability: boolean;
+  availableSeats: number;
+  waitingList: boolean;
+  private: boolean;
+}

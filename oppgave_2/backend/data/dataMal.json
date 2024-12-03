@@ -1,0 +1,18 @@
+[
+  {
+    "id": "00d79a23-2f5b-46b4-9fc4-4ce617ef6439",
+    "title": "Konsert på Haldenscene",
+    "eventOnSameDay": true,
+    "selectedWeekdays": [
+      "sunday",
+      "saturday",
+      "friday"
+    ],
+    "lockedPrice": false,
+    "price": 299,
+    "limitedAvailability": true,
+    "availableSeats": 200,
+    "waitingList": true,
+    "private": false
+  }
+]
