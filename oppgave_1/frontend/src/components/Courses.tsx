@@ -1,11 +1,44 @@
-import { useState } from "react";
-import { courses, categories } from "../data/data";
+import { useEffect, useState } from "react";
+//import { courses, categories } from "../data/data";
+import useCourse from "../hooks/useCourse";
+import { categories } from "@/data/data";
+import { Link } from "react-router-dom";
 
+type Course = {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+};
 
 export default function Courses() {
-    const [value, setValue] = useState("");
-    const [data, setData] = useState(courses);
+    const [value, setValue] = useState("");  
+    const [data, setData] = useState<Course[]>([]);
+    const [courses] = useState<Course[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:3999/kurs");
+        if (!response.ok) {
+          throw new Error("Failed to fetch courses");
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
   
+    useEffect(() => {
+      fetchCourses();
+    }, []);
+
     const handleFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
       const category = event.target.value;
       setValue(category);
@@ -18,7 +51,9 @@ export default function Courses() {
         setData(courses);
       }
     };
-  
+
+    if (loading) return <p>Loading...</p>;
+
     return (
       <>
         <header className="mt-8 flex items-center justify-between">
@@ -67,13 +102,13 @@ export default function Courses() {
                 >
                   {course.description}
                 </p>
-                <a
-                  className="font-semibold underline"
-                  data-testid="courses_url"
-                  href={`/kurs/${course.slug}`}
-                >
-                  Til kurs
-                </a>
+                <Link
+              className="font-semibold underline"
+              data-testid="courses_url"
+              to={`/kurs/${course.slug}`}
+            >
+              Til kurs
+            </Link>
               </article>
             ))
           ) : (

@@ -1,16 +1,23 @@
 import { courses, comments } from '../data/data'; // Importerer data fra data.ts
 import { Course, Lesson, Comment } from '../types/types'; // Importerer Course, Lesson og Comment fra types.ts
+const API_BASE = "http://localhost:3999";
 
 const useCourse = () => {
+
   const createCourse = async (data: Course) => {
-    courses.push(data);
+    const response = await fetch(`${API_BASE}/kurs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return response.json();
   };
+
 
   const getCourse = async (slug: string) => {
-    const data = courses.filter((course) => course.slug === slug);
-    return data?.[0];
+    const response = await fetch(`${API_BASE}/kurs/${slug}`);
+    return response.json();
   };
-
   const getLesson = async (courseSlug: string, lessonSlug: string) => {
     const data = courses
       .flatMap((course) => 
@@ -19,11 +26,9 @@ const useCourse = () => {
     return data?.[0];
   };
 
-  const getComments = async (lessonSlug: string) => {
-    const data = comments.filter(
-      (comment) => comment.lesson.slug === lessonSlug
-    );
-    return data;
+  const getComments = async (courseSlug: string, lessonSlug: string) => {
+    const response = await fetch(`${API_BASE}/kurs/${courseSlug}/${lessonSlug}/kommentarer`);
+    return response.json();
   };
 
   const createComment = async (data: Comment) => {
