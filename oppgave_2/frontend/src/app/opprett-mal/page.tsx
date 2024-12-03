@@ -2,10 +2,24 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
+import { Mal } from '@/types/types';
 
 const OpprettMalPage = () => {
   const router = useRouter();
   const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]);
+  const [formData, setFormData] = useState<Mal>({
+    id: uuidv4(),
+    title: '',
+    eventOnSameDay: false,
+    selectedWeekdays: [],
+    lockedPrice: false,
+    price: 0,
+    limitedAvailability: false,
+    availableSeats: 0,
+    waitingList: false,
+    private: false,
+  });
 
   const handleWeekdayChange = (weekday: string) => {
     if (selectedWeekdays.includes(weekday)) {
@@ -15,10 +29,42 @@ const OpprettMalPage = () => {
     }
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
+    }));
+  };
+
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    // Logikk for å opprette mal
-    router.push('/opprett-arrangement');
+    const updatedFormData = {
+      ...formData,
+      selectedWeekdays,
+    };
+
+    try {
+      const response = await fetch('http://localhost:3999/mals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedFormData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error:', errorData);
+        return;
+      }
+
+      const result = await response.json();
+      console.log('Success:', result);
+      router.push('/opprett-arrangement');
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -26,12 +72,14 @@ const OpprettMalPage = () => {
       <h1 className="text-3xl font-bold mb-6">Opprett Mal</h1>
       <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
         <div>
-          <label htmlFor="name" className="block mb-2 font-medium">
+          <label htmlFor="title" className="block mb-2 font-medium">
             Navn på mal:
           </label>
           <input
             type="text"
-            id="name"
+            id="title"
+            value={formData.title}
+            onChange={handleChange}
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Skriv inn mal navn"
           />
@@ -42,8 +90,14 @@ const OpprettMalPage = () => {
             Tillat arrangementer på samme dag?
           </label>
           <div className="flex items-center">
-            <input type="checkbox" id="same-day" className="mr-2" />
-            <label htmlFor="same-day">Ja</label>
+            <input
+              type="checkbox"
+              id="eventOnSameDay"
+              checked={formData.eventOnSameDay}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label htmlFor="eventOnSameDay">Ja</label>
           </div>
         </div>
 
@@ -52,88 +106,38 @@ const OpprettMalPage = () => {
             Hvilke Dager?
           </label>
           <div className="flex flex-col space-y-2">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="monday"
-                checked={selectedWeekdays.includes('monday')}
-                onChange={() => handleWeekdayChange('monday')}
-                className="mr-2"
-              />
-              <label htmlFor="monday">Mandag</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="tuesday"
-                checked={selectedWeekdays.includes('tuesday')}
-                onChange={() => handleWeekdayChange('tuesday')}
-                className="mr-2"
-              />
-              <label htmlFor="tuesday">Tirsdag</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="wednesday"
-                checked={selectedWeekdays.includes('wednesday')}
-                onChange={() => handleWeekdayChange('wednesday')}
-                className="mr-2"
-              />
-              <label htmlFor="wednesday">Onsdag</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="thursday"
-                checked={selectedWeekdays.includes('thursday')}
-                onChange={() => handleWeekdayChange('thursday')}
-                className="mr-2"
-              />
-              <label htmlFor="thursday">Torsdag</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="friday"
-                checked={selectedWeekdays.includes('friday')}
-                onChange={() => handleWeekdayChange('friday')}
-                className="mr-2"
-              />
-              <label htmlFor="friday">Fredag</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="saturday"
-                checked={selectedWeekdays.includes('saturday')}
-                onChange={() => handleWeekdayChange('saturday')}
-                className="mr-2"
-              />
-              <label htmlFor="saturday">Lørdag</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="sunday"
-                checked={selectedWeekdays.includes('sunday')}
-                onChange={() => handleWeekdayChange('sunday')}
-                className="mr-2"
-              />
-              <label htmlFor="sunday">Søndag</label>
-            </div>
+            {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
+              <div key={day} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={day}
+                  checked={selectedWeekdays.includes(day)}
+                  onChange={() => handleWeekdayChange(day)}
+                  className="mr-2"
+                />
+                <label htmlFor={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
+              </div>
+            ))}
           </div>
         </div>
 
         <div>
-          <label htmlFor="price" className="block mb-2 font-medium">
+          <label htmlFor="lockedPrice" className="block mb-2 font-medium">
             Fast pris?
           </label>
           <div className="flex items-center">
-            <input type="checkbox" id="price" className="mr-2" />
+            <input
+              type="checkbox"
+              id="lockedPrice"
+              checked={formData.lockedPrice}
+              onChange={handleChange}
+              className="mr-2"
+            />
             <input
               type="number"
               id="price"
+              value={formData.price}
+              onChange={handleChange}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="299"
             />
@@ -142,27 +146,51 @@ const OpprettMalPage = () => {
         </div>
 
         <div>
-          <label htmlFor="plasser" className="block mb-2 font-medium">
+          <label htmlFor="limitedAvailability" className="block mb-2 font-medium">
             Begrenset antall plasser?
           </label>
           <input
+              type="checkbox"
+              id="limitedAvailability"
+              checked={formData.limitedAvailability}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label htmlFor="availableSeats" className="block mb-2 font-medium">
+              Antall plasser:
+            </label>
+          <input
             type="number"
-            id="plasser"
+            id="availableSeats"
+            value={formData.availableSeats}
+            onChange={handleChange}
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="20"
           />
         </div>
 
         <div className="flex items-center space-x-2">
-          <input type="checkbox" id="ventelist" className="mr-2" />
-          <label htmlFor="ventelist" className="font-medium">
+          <input
+            type="checkbox"
+            id="waitingList"
+            checked={formData.waitingList}
+            onChange={handleChange}
+            className="mr-2"
+          />
+          <label htmlFor="waitingList" className="font-medium">
             Venteliste?
           </label>
         </div>
 
         <div className="flex items-center space-x-2">
-          <input type="checkbox" id="privat" className="mr-2" />
-          <label htmlFor="privat" className="font-medium">
+          <input
+            type="checkbox"
+            id="private"
+            checked={formData.private}
+            onChange={handleChange}
+            className="mr-2"
+          />
+          <label htmlFor="private" className="font-medium">
             Privat?
           </label>
         </div>
@@ -176,4 +204,3 @@ const OpprettMalPage = () => {
 };
 
 export default OpprettMalPage;
-

@@ -1,4 +1,4 @@
-import { Events } from "@/types/Events";
+import { Events } from "@/types/types";
 import Link from "next/link";
 
 interface EventListProps {

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { Events } from '@/types/Events'
+import { Events } from '@/types/types'
 import Link from 'next/link';
 
 // Koden var ai generet men jobbet videre på den

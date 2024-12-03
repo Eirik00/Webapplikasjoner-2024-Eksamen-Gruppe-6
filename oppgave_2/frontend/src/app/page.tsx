@@ -1,5 +1,5 @@
 import EventList from '@/components/EventList';
-import { Events } from '@/types/Events';
+import { Events } from '@/types/types';
 import Link from 'next/link'
 
 const events: Events[] = [
