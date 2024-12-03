@@ -136,7 +136,7 @@ const OpprettArrangementPage = () => {
     
             const result = await response.json();
             console.log('Success:', result);
-            router.push('/opprett-arrangement');
+            router.push('/');
         } catch (error) {
             console.error('Error:', error);
         }
