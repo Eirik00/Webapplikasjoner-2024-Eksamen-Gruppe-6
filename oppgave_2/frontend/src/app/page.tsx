@@ -1,23 +1,23 @@
+"use client";
 import EventList from '@/components/EventList';
-import { Events } from '@/types/Events';
-import Link from 'next/link'
+import { Events } from '@/types/types';
+import { useEffect, useState } from 'react';
 
-const events: Events[] = [
-  {
-    id: 'concert-2024',
-    title: 'Summer Music Festival',
-    date: new Date('2024-07-15'),
-    type: 'Konsert',
-    description: 'An epic night of live music',
-    location: 'Halden',
-    tickets: [
-      { price: 50, type: 'General Admission', availableSeats: 1000 },
-      { price: 100, type: 'VIP', availableSeats: 200 }
-    ]
-  },
-];
 
 export default function Home() {
+  const [admin, setAdmin] = useState<boolean>(true); // Må legge til admin funksjon
+  const [events, setEvents] = useState<Events[]>([]);
+
+  const fetchEvents = async () => {
+    const res = await fetch('http://localhost:3999/events');
+    const data = await res.json();
+    setEvents(data);
+  }
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-5xl p-4 font-bold mb-6 text-center">Arrangementer</h1>

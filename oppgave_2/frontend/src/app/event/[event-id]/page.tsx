@@ -1,32 +1,55 @@
+"use client";
+
 import { notFound } from 'next/navigation'
-import { Events } from '@/types/Events'
+import { Events } from '@/types/types'
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-// Koden var ai generet men jobbet videre på den
+// Koden var ai generet men vi jobbet videre på den
 
-
-
-// Mock data - in real app, this would come from a database
-const events: Record<string, Events> = {
-  'concert-2024': {
-    id: 'concert-2024',
-    title: 'Summer Music Festival',
-    date: new Date('2024-07-15'),
-    type: 'Konsert',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dui eros, bidendum vel bidendum ut, pretium in ipsum. quisque in phareta odio. nulla id venetatis libero. quisque in phareta odio. nulla id venetatis libero.',
-    location: 'Halden',
-    tickets: [
-      { price: 50, type: 'General Admission', availableSeats: 1000 },
-      { price: 100, type: 'VIP', availableSeats: 200 }
-    ]
-  },
-};
 
 export default function EventPage({ params }: { params: { "event-id": string } }) {
-  const event = events[params["event-id"]];
+  const [loading, setLoading] = useState(true); // ai generert kode
+  const [event, setEvent] = useState<Events>({
+    id: "",
+    title: "",
+    date: new Date(),
+    type: "",
+    description: "",
+    location: "",
+    tickets: []
+  });
 
-  if (!event) {
+
+  
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`http://localhost:3999/events/${params["event-id"]}`);
+        if (!res.ok) {
+          notFound();
+        }
+        const data = await res.json();
+        setEvent(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false); // ai generert kode
+      }
+    }
+
+    fetchEvent();
+    console.log(event);
+  }, [params]);
+
+
+  if (!loading && !event) {
     notFound();
+  }
+
+  if (loading) {
+    return <p>Laster...</p>; // Chatgpt clutcha
   }
 
   return (
