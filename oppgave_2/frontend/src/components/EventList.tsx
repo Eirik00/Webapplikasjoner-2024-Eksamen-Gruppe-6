@@ -22,11 +22,11 @@ export default function EventList({ events, admin }: EventListProps){
     }
 
     return(
-        <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-4 ">
             {events.map((event: Events) => (
                 <article
                 key={event.id} 
-                className="border p-4 hover:bg-gray-100 transition text-center">
+                className="border border-gray-400 rounded-xl p-4 hover:bg-blue-100 transition text-center">
                     <Link 
                         href={admin ? `/endre-arrangement/${event.id}` : `/event/${event.id}`}
                     >
@@ -39,7 +39,7 @@ export default function EventList({ events, admin }: EventListProps){
                         }</p>
                     </Link>
                     <button
-                        className={`p-2 bg-red-500 text-white rounded-md mt-4 ${admin ? 'block ml-auto' : 'hidden'}`}
+                        className={`p-2 bg-red-500 hover:bg-red-700 text-white rounded-md mt-4 ${admin ? 'block ml-auto' : 'hidden'}`}
                         onClick={() => handleClick(event.id)}
                     >Slett Arrangement</button>
                 </article>

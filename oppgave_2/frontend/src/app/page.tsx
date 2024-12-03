@@ -46,8 +46,8 @@ export default function Home() {
         <title>Arrangement Ordning</title>
         <meta name="description" content="En webapplikasjon for å arrangere arrangementer" />
       </Head>
-      <div className="container mx-auto p-4">
-        <h1 className="text-4xl font-bold mb-6">Arrangementer</h1>
+      <div className="container mx-auto p-10">
+        <h1 className="text-4xl font-bold mb-6 text-center">Arrangementer</h1>
         <input 
           type="text" 
           placeholder="Filter by type" 
@@ -57,7 +57,7 @@ export default function Home() {
         />
         <GroupedEvents events={filteredEvents} admin={admin}/>
         <button
-          className={`p-2 mt-4 rounded  ${admin ? 'bg-red-500 text-white' : 'bg-green-500 text-black'}`}
+          className={`p-2 mt-4 rounded  ${admin ? 'bg-red-500 hover:bg-red-700 text-white' : 'bg-green-500 text-black'}`}
           onClick={() => setAdmin(!admin)}
         >
           {admin ? "Skru av Admin" : "Skru på Admin"}
