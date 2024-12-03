@@ -1,17 +1,39 @@
+"use client"
+
 import { useState, useEffect } from "react";
 import Lesson from "./Lesson";
 import { courses, users } from "../data/data";
 import type { Course } from "../types/types";
-import useCourse from "../hooks/useCourse";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export default function Course( ) {
+type CourseProps = {
+  slug: string;
+};
+
+export default function Course() {
     const [content, setContent] = useState<Course | null>(null);
-  
-    const courseSlug = "javascript-101";
-    const lessonSlug = "variabler";
-
-    const { getCourse } = useCourse();
     
+    const { courseSlug, lessonSlug } = useParams<{
+      courseSlug: string;
+      lessonSlug: string;
+    }>();
+
+    const getCourse = async (courseSlug: string) => {
+
+    const courseResponse = await fetch(`http://localhost:3999/kurs/${courseSlug}`);
+    const course = await courseResponse.json();
+    
+    const lessonsResponse = await fetch(`http://localhost:3999/kurs/${courseSlug}/leksjoner`);
+    const lessons = await lessonsResponse.json();
+    
+    return { ...course, lessons };
+
+    };
+    
+    if (!courseSlug) {
+      return <p>Kurs ikke funnet</p>;
+    }
 
     useEffect(() => {
       const getContent = async () => {
@@ -33,14 +55,14 @@ export default function Course( ) {
                 }`}
                 key={lesson.id}
               >
-                <a
+                <Link
+                  to={`/kurs/${content?.slug}/${lesson.slug}`}
+                  className={`block h-full w-full`}
                   data-testid="lesson_url"
                   data-slug={lessonSlug}
-                  className="block h-full w-full"
-                  href={`/kurs/${content?.slug}/${lesson.slug}`}
-                >
+                  >
                   {lesson.title}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
